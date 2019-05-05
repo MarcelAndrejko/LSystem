@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link href="style.css" rel="stylesheet"/>
+    <script src="js/jquery-2.2.2.min.js"></script>
+
+    <script>
+        var def = [];
+    </script>
+    
+    <script src="js/LSystem/def.HilbertCurve.js"></script>
+    <script src="js/LSystem/def.StochasticFuzzyWeed.js"></script>
+    <script src="js/LSystem/def.WavySeaweed.js"></script>
+    <script src="js/LSystem/def.TallSeaweed.js"></script>
+    <script src="js/LSystem/def.TwiggyWeed.js"></script>
+    <script src="js/LSystem/def.FuzzyWeed.js"></script>
+    <script src="js/LSystem/def.ArrowWeed.js"></script>
+    <script src="js/LSystem/def.KochSnowflake.js"></script>
+    <script src="js/LSystem/def.BinaryTree.js"></script>
+    <script src="js/LSystem/def.Snowflake.js"></script>
+    <script src="js/LSystem/def.SierpinskiTriangle.js"></script>
+    <script src="js/LSystem/def.SierpinskiTriangle1.js"></script>
+    <script src="js/LSystem/def.DragonCurve.js"></script>
+    <script src="js/LSystem/LSystem.js"></script>
+    <script src="js/LSystem/SvgLSystem.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            for (i=0; i<def.length; i++)
+                $('#def').append('<option value="'+i+'">'+def[i].title+'</option>');
+
+            $('input[type=button]').on('click', function() {
+                $(this).prop('disabled', true);
+                $('svg').SvgLSystem({
+                    'def': def[$('#def').val()], 
+                    'n': $('#n').val()
+                });
+                $(this).prop('disabled', false); 
+            });
+        });
+    </script>
+    
+    <title>Lindenmayer system</title>
+</head>
+<body>
+    <svg preserveAspectRatio="xMidYMid meet"/>
+    <div>
+        <select id="def">
+        </select>
+        <input id="n" type="number" min="1" max="20" value="10">
+        <input type="button" value="ok">
+    </div>
+</body>
+</html>
