@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
     <link href="style.css" rel="stylesheet"/>
+    <link href="style-svg.css" rel="stylesheet"/>
     <script src="js/jquery-2.2.2.min.js"></script>
 
     <script>
         var def = [];
     </script>
     
-    <script src="js/LSystem/def.HilbertCurve.js"></script>
     <script src="js/LSystem/def.StochasticFuzzyWeed.js"></script>
+    <script src="js/LSystem/def.HilbertCurve.js"></script>
     <script src="js/LSystem/def.WavySeaweed.js"></script>
     <script src="js/LSystem/def.TallSeaweed.js"></script>
     <script src="js/LSystem/def.TwiggyWeed.js"></script>
@@ -25,6 +26,8 @@
     <script src="js/LSystem/def.SierpinskiTriangle.js"></script>
     <script src="js/LSystem/def.SierpinskiTriangle1.js"></script>
     <script src="js/LSystem/def.DragonCurve.js"></script>
+
+    <script src="js/LSystem/Turtle.js"></script>
     <script src="js/LSystem/LSystem.js"></script>
     <script src="js/LSystem/SvgLSystem.js"></script>
 
@@ -33,13 +36,41 @@
             for (i=0; i<def.length; i++)
                 $('#def').append('<option value="'+i+'">'+def[i].title+'</option>');
 
-            $('input[type=button]').on('click', function() {
-                $(this).prop('disabled', true);
-                $('svg').SvgLSystem({
-                    'def': def[$('#def').val()], 
-                    'n': $('#n').val()
-                });
-                $(this).prop('disabled', false); 
+            var s = new SvgLSystem(document.getElementById('svgContainer'));
+            
+            s.onPauseDraw = function(){};
+            s.onStartDraw = function(){};
+            
+            //must be set before initialize, because of setting turtle's callback
+            s.onTurtleStep = function(currentStep, totalSteps) {
+                var perc = 0;
+                if (totalSteps!=0)
+                    perc = (currentStep*100)/totalSteps;
+                $('.progressBar .current').css('width', perc+'%');
+                $('#step').html(currentStep+' of '+totalSteps);
+                $('#progress').html(perc.toFixed(2)+'%');
+            };
+            
+            s.initialize(def[$('#def').val()], $('#n').val());
+
+            $('input#pausePlay').on('click', function() {
+                if ($(this).attr('data-state') == 'play') {
+                    $(this).val('\u23F8 pause');
+                    $('input#pausePlay').attr('data-state', 'pause');
+                    s.startDraw();
+                } else {
+                    $(this).val('\u25B6 play');
+                    $('input#pausePlay').attr('data-state', 'play');
+                    s.pauseDraw();
+                }
+            });
+
+            $('input#ok').on('click', function() {
+                $('input#pausePlay').val('\u23F8 pause');
+                $('input#pausePlay').attr('data-state', 'pause');
+                s.pauseDraw();
+                s.initialize(def[$('#def').val()], $('#n').val());
+                s.startDraw();
             });
         });
     </script>
@@ -47,12 +78,17 @@
     <title>Lindenmayer system</title>
 </head>
 <body>
-    <svg preserveAspectRatio="xMidYMid meet"/>
-    <div>
-        <select id="def">
-        </select>
-        <input id="n" type="number" min="1" max="20" value="10">
-        <input type="button" value="ok">
+    <div id="svgContainer"></div>
+    <div id="setup">
+        <label for="def"><strong>L-System:</strong></label>
+        <select id="def"></select>
+        <label for="n">Iterations:</label>
+        <input id="n" type="number" min="1" max="20" value="5">
+        <input id="ok" type="button" value="set &amp; play">
+        <input id="pausePlay" type="button" value="&#9654; play" data-state="play">
     </div>
+    <div class="progressBar"><div class="current"></div></div>
+    <div id="step"></div>
+    <div id="progress"></div>
 </body>
 </html>
